@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autonomous Enterprise AI Platform — Joule & Business AI Platform</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', 'Noto Sans KR', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .glass-card { background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
+    .gradient-brand { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #6d28d9 100%); }
+    .gradient-joule { background: linear-gradient(135deg, #5b21b6 0%, #2563eb 100%); }
+    .tab-active { background: #eef2ff; color: #4338ca; border-color: #6366f1; font-weight: 600; }
+    .kg-node { cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; }
+    .kg-node:hover { filter: brightness(1.08); }
+    .pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Header -->
+  <header class="gradient-brand text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shadow-inner">
+          <svg class="w-5 h-5 text-violet-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight">Autonomous Enterprise AI Platform</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 mr-1.5 pulse-dot"></span>Joule Core Active
+            </span>
+          </div>
+          <p class="text-xs text-indigo-200">People set the direction. AI executes. Built on Business AI Platform</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <!-- Industry Context Switcher -->
+        <div class="inline-flex rounded-lg bg-white/10 p-0.5 border border-white/20" role="group" aria-label="산업군 선택">
+          <button id="btn-ind-im" type="button" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition">산업제조 (IM)</button>
+          <button id="btn-ind-auto" type="button" class="px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition">자동차 (Auto)</button>
+        </div>
+
+        <!-- Principal Propagation Role Selector -->
+        <div class="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-lg px-2.5 py-1">
+          <span class="text-[11px] text-indigo-200 hidden md:inline">역할 권한:</span>
+          <select id="role-select" aria-label="역할 권한 선택" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer">
+            <option value="COO" class="text-slate-900">COO (생산·운영)</option>
+            <option value="CFO" class="text-slate-900">CFO (재무·ESG)</option>
+            <option value="CPO" class="text-slate-900">CPO (조달·공급망)</option>
+            <option value="CIO" class="text-slate-900">CIO/CDO (IT·거버넌스)</option>
+            <option value="CHRO" class="text-slate-900">CHRO (인사·스킬)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white/95 border-b border-slate-200 text-slate-700">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2">
+        <button data-tab="joule" class="nav-tab tab-active px-3.5 py-2 rounded-lg text-xs sm:text-sm border border-transparent whitespace-nowrap transition flex items-center gap-1.5">
+          <span>1. Joule Work</span>
+        </button>
+        <button data-tab="suite" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm border border-transparent hover:bg-slate-100 whitespace-nowrap transition flex items-center gap-1.5">
+          <span>2. Autonomous Suite</span>
+          <span class="px-1.5 py-0.5 text-[10px] rounded bg-indigo-100 text-indigo-700 font-semibold">292 Agents</span>
+        </button>
+        <button data-tab="industry" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm border border-transparent hover:bg-slate-100 whitespace-nowrap transition">
+          3. Industry & Embodied AI
+        </button>
+        <button data-tab="baip" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm border border-transparent hover:bg-slate-100 whitespace-nowrap transition">
+          4. Business AI Platform
+        </button>
+        <button data-tab="insights" class="nav-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm border border-transparent hover:bg-slate-100 whitespace-nowrap transition">
+          5. 수익성 · ESG · 전환 관제
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Dynamic Industry Context Banner -->
+    <section id="industry-kpi-strip" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"></section>
+
+    <!-- TAB 1: JOULE WORK -->
+    <section id="tab-joule" class="tab-panel space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: Joule Conversations -->
+        <div class="lg:col-span-8 glass-card rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full gradient-joule"></span>
+                Joule Work — 대화형 통합 워크스페이스
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">의도만 입력하면 Joule Assistant가 ERP·Non-SAP 데이터와 전문 AI Agent를 조율해 실행합니다.</p>
+            </div>
+            <span id="joule-role-badge" class="px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">Principal Auth: COO</span>
+          </div>
+
+          <!-- Quick Intent Prompts -->
+          <div>
+            <p class="text-xs font-semibold text-slate-500 mb-2">추천 실행 시나리오 (클릭하여 즉시 실행):</p>
+            <div id="joule-quick-prompts" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- Conversation Stream -->
+          <div id="joule-chat-log" class="bg-slate-50 border border-slate-200 rounded-xl p-4 min-h-[280px] max-h-[420px] overflow-y-auto space-y-4">
+            <div class="flex gap-3">
+              <div class="w-8 h-8 rounded-lg gradient-joule text-white flex items-center justify-center font-bold text-xs shrink-0">J</div>
+              <div class="bg-white border border-slate-200 rounded-xl p-3.5 text-sm text-slate-700 shadow-sm max-w-2xl">
+                <p class="font-semibold text-slate-900 mb-1">안녕하세요! Joule Work입니다.</p>
+                <p class="text-xs sm:text-sm leading-relaxed">현재 <span id="welcome-industry-label" class="font-semibold text-indigo-700">산업제조(IM)</span> 컨텍스트와 <span id="welcome-role-label" class="font-semibold text-indigo-700">COO</span> 권한으로 연결되어 있습니다. 생산 스케줄링, 공급망 관세 대응, 탄소 발자국(PCF) 산출, 또는 로봇 물류 지시 등 원하는 업무를 입력하세요.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Intent Input Form -->
+          <form id="joule-form" class="flex gap-2">
+            <input id="joule-input" type="text" placeholder="What are we solving today? (예: 관세 15% 인상 시 니어쇼어링 마진 영향 분석해줘)" class="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" />
+            <button type="submit" class="gradient-joule text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:opacity-95 transition shrink-0 shadow-sm">실행</button>
+          </form>
+        </div>
+
+        <!-- Right: Dynamic Spaces -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="glass-card rounded-2xl p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-900 mb-1">Spaces (목표 기반 지능형 작업 공간)</h3>
+            <p class="text-xs text-slate-500 mb-3">목표에 따라 필요한 Data, Agent, 맥락을 자동 구성합니다.</p>
+            <div id="joule-spaces-list" class="space-y-2.5"></div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 shadow-sm bg-gradient-to-br from-indigo-50/70 to-violet-50/70">
+            <h3 class="text-sm font-bold text-indigo-950 mb-1">최근 Joule 오케스트레이션 성과</h3>
+            <p class="text-xs text-indigo-700 mb-3">글로벌 선도 고객사 실증 벤치마크 기준</p>
+            <div id="joule-benchmarks" class="space-y-2 text-xs"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: AUTONOMOUS SUITE -->
+    <section id="tab-suite" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Autonomous Suite — 5대 도메인 E2E 에이전트 탐색기</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Finance(54) · SCM(61) · Spend(52) · HCM(81) · CX(44) 등 총 57개 Assistant와 292개 이상의 전문 Agent를 탐색하고 즉시 실행합니다.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="suite-search" type="search" placeholder="Assistant 또는 Agent 검색..." class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs sm:text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <!-- Domain Filter Pills -->
+        <div id="suite-domain-filters" class="flex flex-wrap gap-2 py-4"></div>
+
+        <!-- Assistants & Agents Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div id="suite-assistants-grid" class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[560px] overflow-y-auto pr-1"></div>
+
+          <!-- Selected Assistant / Agent Execution Panel -->
+          <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between gap-4">
+            <div id="suite-detail-panel" class="space-y-3">
+              <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Assistant 상세 & 실행</span>
+              <h3 id="detail-title" class="text-base font-bold text-slate-900">좌측에서 Assistant를 선택하세요</h3>
+              <p id="detail-desc" class="text-xs text-slate-600">각 Assistant는 하위 전문 AI Agent들을 조율하여 ERP/클라우드 비즈니스 프로세스를 End-to-End로 실행합니다.</p>
+              <div id="detail-agents-list" class="flex flex-wrap gap-1.5 pt-1"></div>
+            </div>
+
+            <div class="border-t border-slate-200 pt-3 space-y-2.5">
+              <button id="btn-run-assistant" type="button" class="w-full gradient-joule text-white py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold hover:opacity-95 transition disabled:opacity-40" disabled>
+                선택한 Assistant 워크플로우 실행
+              </button>
+              <div id="suite-run-output" class="hidden bg-white border border-emerald-200 rounded-lg p-3 text-xs text-slate-700 space-y-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: INDUSTRY & EMBODIED AI -->
+    <section id="tab-industry" class="tab-panel hidden space-y-6">
+      <!-- Industry Closed-loop Scenarios -->
+      <div class="glass-card rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Industry AI — 산업 특화 Closed-Loop 솔루션</h2>
+            <p class="text-xs text-slate-500">가치사슬(Value Chain) 전 단계에 산업별 프로세스 지식, 데이터 모델, 규제 로직을 내장했습니다.</p>
+          </div>
+          <span id="industry-scenario-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-800"></span>
+        </div>
+        <div id="industry-scenarios-container" class="space-y-5"></div>
+      </div>
+
+      <!-- Embodied AI Control Center -->
+      <div class="glass-card rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              Embodied AI — 물리 세계와 비즈니스 로직 연결 (Closed-Loop Robotics)
+            </h2>
+            <p class="text-xs text-slate-500">Joule이 창고·제조 현장의 휴머노이드/인지 로봇을 실시간 지시하고, 실행 결과를 S/4HANA·EWM·APM에 자동 반영합니다.</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Open Robot OS Connected</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Mission Dispatcher -->
+          <div class="lg:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <h3 class="text-sm font-bold text-slate-900">로봇 작업 미션 지시 (Joule Orchestrator)</h3>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">유즈케이스 선택</label>
+              <select id="embodied-usecase" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs sm:text-sm bg-white">
+                <option value="Picking & Placing">Picking & Placing (자재 우선순위 지정·피킹·배송)</option>
+                <option value="Asset Inspection">Asset Inspection (설비 이상 징후 정밀 점검)</option>
+                <option value="Quality Inspection">Quality Inspection (차체·부품 비주얼 품질 검사)</option>
+                <option value="Digital Manufacturing">Digital Manufacturing (조립 라인 협동 작업)</option>
+                <option value="Safety Inspection">Safety Inspection (작업장 안전·EHS 순찰)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">연계 애플리케이션 모듈</label>
+              <select id="embodied-app" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs sm:text-sm bg-white">
+                <option value="EWM (창고 관리)">Extended Warehouse Management (EWM)</option>
+                <option value="DM (디지털 매뉴팩처링)">Digital Manufacturing (DM)</option>
+                <option value="APM (설비 자산 성과)">Asset Performance Management (APM)</option>
+                <option value="FSM (현장 서비스)">Field Service Management (FSM)</option>
+                <option value="EHS (환경·안전·보건)">Environment, Health & Safety (EHS)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">타겟 로봇 플릿</label>
+              <select id="embodied-robot" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs sm:text-sm bg-white">
+                <option value="HMND-01 Humanoid (Logistics Bay A)">HMND-01 Humanoid (Logistics Bay A)</option>
+                <option value="AMR-Fleet-07 (Assembly Line 2)">AMR-Fleet-07 (Assembly Line 2)</option>
+                <option value="Spot-Inspect-03 (High-Temp Zone)">Spot-Inspect-03 (High-Temp Zone)</option>
+              </select>
+            </div>
+            <button id="btn-dispatch-robot" type="button" class="w-full gradient-joule text-white py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:opacity-95 transition">
+              물리 AI 미션 실행 및 ERP 동기화
+            </button>
+          </div>
+
+          <!-- Closed-loop Execution Visualizer -->
+          <div class="lg:col-span-7 space-y-3">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+              <div id="step-emb-1" class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs">
+                <div class="font-bold text-indigo-700">1. Joule</div>
+                <div class="text-slate-500 text-[11px]">비즈니스 맥락 판단</div>
+              </div>
+              <div id="step-emb-2" class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs">
+                <div class="font-bold text-indigo-700">2. Embodied Agent</div>
+                <div class="text-slate-500 text-[11px]">Physical AI 경로 생성</div>
+              </div>
+              <div id="step-emb-3" class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs">
+                <div class="font-bold text-indigo-700">3. Robot OS</div>
+                <div class="text-slate-500 text-[11px]">현장 물리 작업 수행</div>
+              </div>
+              <div id="step-emb-4" class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs">
+                <div class="font-bold text-indigo-700">4. Closed-Loop</div>
+                <div class="text-slate-500 text-[11px]">ERP 실적 자동 전기</div>
+              </div>
+            </div>
+            <div id="embodied-log" class="bg-slate-900 text-slate-100 rounded-xl p-4 font-mono text-xs h-52 overflow-y-auto space-y-1.5">
+              <div class="text-emerald-400">[SYSTEM] Embodied AI on BAIP 초기화 완료. 개방형 로봇 파트너 에코시스템 대기 중...</div>
+              <div class="text-slate-400">[INFO] Martur Fompak 자율 사내 물류 모델 참조 활성화 (처리량↑, 수작업 오류 0% 목표)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: BUSINESS AI PLATFORM (BAIP) -->
+    <section id="tab-baip" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Build: Joule Studio -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-5 shadow-sm space-y-4">
+          <div>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 text-indigo-700">BUILD</span>
+            <h2 class="text-base font-bold text-slate-900 mt-1">Joule Studio — Custom AI Agent 빌더</h2>
+            <p class="text-xs text-slate-500">표준 Agent에 자사 고유 비즈니스 로직과 승인 규칙을 결합해 즉시 운영 환경에 배포합니다.</p>
+          </div>
+          <form id="studio-form" class="space-y-3 text-xs sm:text-sm">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">커스텀 에이전트 이름</label>
+              <input id="studio-name" type="text" required placeholder="예: 긴급 관세 대응 조달 승인 Agent" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">기반 표준 Agent</label>
+              <select id="studio-base" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs sm:text-sm bg-white">
+                <option>Procurement Agent (표준 조달)</option>
+                <option>Production Planning Agent (생산 계획)</option>
+                <option>Visit Report Assistant (영업 방문 보고)</option>
+                <option>Carbon Footprint Agent (PCF/CBAM)</option>
+                <option>Quality Inspection Agent (품질 검사)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">자사 고유 비즈니스 로직 (Custom Rule)</label>
+              <input id="studio-rule" type="text" required value="관세 영향 10% 초과 발주 시 니어쇼어링 대체 공급처 자동 추천 후 CPO 승인 요청" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs sm:text-sm" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">AI 모델</label>
+                <select id="studio-model" class="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-xs bg-white">
+                  <option>SAP Foundation Model</option>
+                  <option>Anthropic Claude</option>
+                  <option>OpenAI GPT</option>
+                  <option>Mistral / Cohere</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">데이터 인프라</label>
+                <select id="studio-data" class="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-xs bg-white">
+                  <option>HANA Cloud Multi-model</option>
+                  <option>SAP Datasphere</option>
+                  <option>Databricks Delta</option>
+                  <option>SAP Snowflake</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="w-full gradient-joule text-white py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:opacity-95 transition">
+              에이전트 빌드 및 AI Agent Hub 배포
+            </button>
+          </form>
+          <div id="studio-toast" class="hidden rounded-lg bg-emerald-50 border border-emerald-200 p-2.5 text-xs text-emerald-800 font-medium"></div>
+        </div>
+
+        <!-- Contextualize & Reason: Knowledge Graph -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-sky-100 text-sky-700">CONTEXTUALIZE & REASON</span>
+              <h2 class="text-base font-bold text-slate-900 mt-1">Semantic Layer & Knowledge Graph 관계 추론</h2>
+              <p class="text-xs text-slate-500">Business Object 노드를 클릭하면 Root Cause 및 Impact Analysis를 실시간으로 수행합니다.</p>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-x-auto">
+            <svg id="kg-svg" viewBox="0 0 680 230" class="w-full min-w-[520px] h-56">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <!-- Edges -->
+              <line x1="115" y1="65" x2="225" y2="65" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="115" y1="165" x2="225" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="335" y1="65" x2="435" y2="115" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="335" y1="165" x2="435" y2="115" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="545" y1="115" x2="600" y2="115" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+              <!-- Nodes -->
+              <g class="kg-node" data-node="supplier">
+                <rect x="10" y="38" width="105" height="54" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2" />
+                <text x="62" y="61" text-anchor="middle" font-size="11" font-weight="700" fill="#1e1b4b">Supplier</text>
+                <text x="62" y="77" text-anchor="middle" font-size="9.5" fill="#4338ca">공급사·관세 리스크</text>
+              </g>
+              <g class="kg-node" data-node="carbon">
+                <rect x="10" y="138" width="105" height="54" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2" />
+                <text x="62" y="161" text-anchor="middle" font-size="11" font-weight="700" fill="#064e3b">Carbon PCF</text>
+                <text x="62" y="177" text-anchor="middle" font-size="9.5" fill="#047857">Scope 3 · CBAM</text>
+              </g>
+              <g class="kg-node" data-node="bom">
+                <rect x="225" y="38" width="110" height="54" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2" />
+                <text x="280" y="61" text-anchor="middle" font-size="11" font-weight="700" fill="#2e1065">Material / BOM</text>
+                <text x="280" y="77" text-anchor="middle" font-size="9.5" fill="#6d28d9">원자재·배터리/강판</text>
+              </g>
+              <g class="kg-node" data-node="plant">
+                <rect x="225" y="138" width="110" height="54" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2" />
+                <text x="280" y="161" text-anchor="middle" font-size="11" font-weight="700" fill="#7c2d12">Plant & Asset</text>
+                <text x="280" y="177" text-anchor="middle" font-size="9.5" fill="#c2410c">OEE · 예지정비</text>
+              </g>
+              <g class="kg-node" data-node="order">
+                <rect x="435" y="88" width="110" height="54" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />
+                <text x="490" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a8a">Prod. Order</text>
+                <text x="490" y="127" text-anchor="middle" font-size="9.5" fill="#1d4ed8">CTO+ 주문·납기</text>
+              </g>
+              <g class="kg-node" data-node="margin">
+                <rect x="600" y="88" width="72" height="54" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2" />
+                <text x="636" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#7f1d1d">Margin</text>
+                <text x="636" y="127" text-anchor="middle" font-size="9.5" fill="#b91c1c">실시간 손익</text>
+              </g>
+            </svg>
+          </div>
+
+          <div id="kg-analysis-box" class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-3.5 text-xs text-slate-700">
+            <span class="font-bold text-indigo-900">Knowledge Graph 추론 결과:</span> 위 그래프의 Business Object 노드를 클릭하면 연관된 영향 범위(Impact Analysis)와 권장 조치가 표시됩니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- Governance: AI Agent Hub & Audit Trail -->
+      <div class="glass-card rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-700">GOVERNANCE</span>
+            <h2 class="text-base font-bold text-slate-900 mt-1">AI Agent Hub — 라이프사이클 관리 및 감사 추적 (Audit Trail)</h2>
+          </div>
+          <span class="text-xs text-slate-500">IAS/IPS 인증 · Role-based Auth · Compliance Alignment 기본 내장</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Registered Agents Hub -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <div class="bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 flex justify-between">
+              <span>등록된 AI Agent 라이프사이클</span>
+              <span id="hub-count" class="text-indigo-700"></span>
+            </div>
+            <div id="agent-hub-list" class="divide-y divide-slate-100 max-h-64 overflow-y-auto bg-white"></div>
+          </div>
+
+          <!-- Audit Trail -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <div class="bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 flex justify-between">
+              <span>실시간 감사 로그 (Access & Execution Trail)</span>
+              <span class="text-emerald-700">Immutable Log</span>
+            </div>
+            <div id="audit-trail-list" class="divide-y divide-slate-100 max-h-64 overflow-y-auto bg-white text-xs"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: PROFITABILITY, ESG & TRANSFORMATION -->
+    <section id="tab-insights" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- PaPM / SAC Real-time Profitability & Tariff Simulator -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-5 shadow-sm space-y-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">E2E 수익성 · 관세 · 탄소 원가 시뮬레이터 (PaPM & SAC)</h2>
+            <p class="text-xs text-slate-500">대량 제조 데이터(BOM·생산실적)와 배부 기준(탄소·활동기준원가)을 실시간 반영해 마진을 시뮬레이션합니다.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+            <div>
+              <div class="flex justify-between font-semibold mb-1"><span>미국/글로벌 관세율 (%)</span><span id="val-tariff" class="text-indigo-700">15%</span></div>
+              <input id="sim-tariff" type="range" min="0" max="50" value="15" class="w-full accent-indigo-600" />
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1"><span>EU CBAM 탄소 가격 (€/tCO₂)</span><span id="val-carbon" class="text-indigo-700">€85</span></div>
+              <input id="sim-carbon" type="range" min="0" max="150" value="85" class="w-full accent-indigo-600" />
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1"><span>니어쇼어링·현지 생산 비중 (%)</span><span id="val-local" class="text-emerald-700">45%</span></div>
+              <input id="sim-local" type="range" min="0" max="100" value="45" class="w-full accent-emerald-600" />
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1"><span>AI 스크랩/재고 절감율 (%)</span><span id="val-scrap" class="text-emerald-700">6%</span></div>
+              <input id="sim-scrap" type="range" min="0" max="15" value="6" class="w-full accent-emerald-600" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+              <div class="text-[11px] text-slate-500">예상 순관세·탄소 부담</div>
+              <div id="kpi-cost-burden" class="text-base sm:text-lg font-bold text-rose-600 mt-0.5"></div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+              <div class="text-[11px] text-slate-500">AI 최적화 원가 절감</div>
+              <div id="kpi-ai-saving" class="text-base sm:text-lg font-bold text-emerald-600 mt-0.5"></div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+              <div class="text-[11px] text-slate-500">조정 영업이익률 (EBIT)</div>
+              <div id="kpi-ebit-margin" class="text-base sm:text-lg font-bold text-indigo-700 mt-0.5"></div>
+            </div>
+          </div>
+
+          <div class="relative h-64">
+            <canvas id="profitChart"></canvas>
+          </div>
+        </div>
+
+        <!-- ESG Green Ledger & Agent-led Transformation -->
+        <div class="lg:col-span-5 space-y-6">
+          <!-- Integrated ESG Control Tower -->
+          <div class="glass-card rounded-2xl p-5 shadow-sm space-y-3">
+            <h2 class="text-base font-bold text-slate-900">통합 ESG & 탄소 회계 Control Tower (Green Ledger)</h2>
+            <p class="text-xs text-slate-500">재무·물류 트랜잭션과 연동된 Scope 1·2·3 및 제품 탄소 발자국(PCF) 실시간 관리</p>
+            <div class="space-y-2.5 text-xs">
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-emerald-50 border border-emerald-200">
+                <div>
+                  <div class="font-bold text-emerald-950">EU CBAM & Carbon Ledger</div>
+                  <div class="text-emerald-700">철강·알루미늄·배터리 원자재 탄소 원가 자동 배부</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold">연동 완료</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-indigo-50 border border-indigo-200">
+                <div>
+                  <div class="font-bold text-indigo-950">Catena-X / SDX PCF 데이터 교환</div>
+                  <div class="text-indigo-700">EU Battery Passport (2027.02 의무화) 표준 준수</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-semibold">3-5x 효율</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                <div>
+                  <div class="font-bold text-slate-900">친환경 프리미엄 수익 포착</div>
+                  <div class="text-slate-600">일반 제품 대비 15~30% 프리미엄 마진 추적</div>
+                </div>
+                <span class="font-bold text-slate-800">+22.4% avg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent-led Business Transformation -->
+          <div class="glass-card rounded-2xl p-5 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <h2 class="text-base font-bold text-slate-900">Agent-led 전환 관제 콕핏</h2>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-violet-100 text-violet-800">전환 공수 35%↓</span>
+            </div>
+            <p class="text-xs text-slate-500">7대 마이그레이션 Assistant 기반 Clean Core 유지 및 리스크 선제 예측</p>
+            <div class="space-y-2 text-xs">
+              <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                <div class="flex items-center justify-between font-bold text-amber-900 mb-1">
+                  <span>"Cassandra" 잠재 리스크 선제 예측</span>
+                  <button id="btn-mitigate-risk" type="button" class="px-2 py-0.5 rounded bg-amber-600 text-white text-[11px] hover:bg-amber-700">완화 조치 실행</button>
+                </div>
+                <p id="cassandra-msg" class="text-amber-800">레거시 ABAP 커스텀 코드 142건 중 18건이 S/4HANA Clean Core 표준과 충돌 위험이 감지되었습니다.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-sky-50 border border-sky-200">
+                <div class="font-bold text-sky-900 mb-1">"Morning Brew" 일일 상황 보고</div>
+                <p class="text-sky-800">데이터 품질 검증률 99.2% · 자동 테스트 케이스 1,420건 통과 · 글로벌 템플릿 롤아웃 정상 진행 중</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // --- Grounded Dataset from 2027 SAP Industry PoV (IM & Automotive) ---
+    const INDUSTRY_DATA = {
+      im: {
+        label: '산업제조 (Industrial Manufacturing)',
+        kpis: [
+          { title: '유지보수 비용 절감', value: '25~45%', sub: '예지정비·품질 AI 실증 (다운타임 30~50%↓)', color: 'text-indigo-700' },
+          { title: 'AI 스크랩 절감 목표', value: '2% → 10%', sub: 'John Deere 56개 공장 단일 ERP 기반', color: 'text-emerald-700' },
+          { title: '공급망 재고 절감 / IRR', value: '12% / 51%', sub: 'Kennametal SAP IBP 다단계 재고 최적화', color: 'text-violet-700' },
+          { title: '영업 보고서 시간 단축', value: '83% (5,220h)', sub: 'Hörmann AI 음성→문서 자동화', color: 'text-sky-700' }
+        ],
+        prompts: [
+          'John Deere 스타일 레이저 절단 스크랩 10% 절감 및 간접자재 예측 실행',
+          'Kennametal 스타일 다단계 안전재고(MEIO) 재산출 및 탄소 감축 분석',
+          'Hörmann AI Visit Report 음성 메모 → 영업 방문 보고서 자동 생성',
+          '설비 진동 이상 감지: 예지정비 워크오더 및 부품 조달 자동 실행'
+        ],
+        benchmarks: [
+          { name: 'John Deere', metric: '56개 공장 단일 ERP · 스크랩 2%→10% 절감' },
+          { name: 'Kennametal', metric: '재고 12%↓ · IRR 51% · 투자회수 2.3년' },
+          { name: 'Hörmann', metric: '보고서 작성 83% 단축 (연 5,220시간 절약)' },
+          { name: 'MAPAL / Hilti', metric: '견적 접점 66%↓ / CX 연관 프로세스 30개 연결' }
+        ],
+        scenarios: [
+          {
+            title: 'Autonomous Asset Management (설비자산 생애주기 Closed-Loop)',
+            steps: ['자산 정보관리 (MDG/AAM)', '자산 취득 및 분석 (APM)', '자산관리 전략 수립', '유지보수 계획 (Cloud ERP)', '유지보수 실행 (FSA/SAM)']
+          },
+          {
+            title: 'Autonomous Adaptive Production (맞춤형 주문 CTO+ 자율 생산)',
+            steps: ['연구개발·엔지니어링 (IPD)', '영업 & 견적 (Sales/CPQ)', '공급망 계획·소싱 (IBP/Ariba)', '제조 및 납품 (Digital Mfg)', '설치 및 서비스 (APM/FSM)']
+          }
+        ]
+      },
+      auto: {
+        label: '자동차 · 모빌리티 (Automotive)',
+        kpis: [
+          { title: '월말 결산·원가 처리 단축', value: '40% / 1,000h+', sub: 'GM Clean Core & 300억 레코드 통합', color: 'text-indigo-700' },
+          { title: 'PCF 산출 효율 & 비용 절감', value: '3~5x / €10,000', sub: 'WITTE Catena-X 기반 Scope 2 98%↓', color: 'text-emerald-700' },
+          { title: '물리 AI 현장 만족도', value: '>80% / >90%', sub: 'Martur Fompak 휴머노이드 자율 물류', color: 'text-violet-700' },
+          { title: '관세 비용 전가·대응 시급도', value: '82% 기업 전가', sub: '미국 관세 누적 350억$+ · 리쇼어링 가속', color: 'text-rose-600' }
+        ],
+        prompts: [
+          '미국 관세 15% 및 캐나다 50% 위협 시 북미 공급망 다중 소싱 시뮬레이션',
+          'WITTE 스타일 Catena-X & EU Battery Passport 제품 탄소발자국(PCF) 산출',
+          'SDV 커넥티드 서비스(OTA·구독) CPQ 번들 견적 및 BRIM 과금 생성',
+          'Martur Fompak 스타일 창고 휴머노이드 로봇 자재 피킹 및 EWM 실적 반영'
+        ],
+        benchmarks: [
+          { name: 'General Motors', metric: '처리시간 40% 단축 · 일 1,000시간+ 절감' },
+          { name: 'WITTE Automotive', metric: 'PCF 산출 3~5배 효율 · 건당 €10,000 절감' },
+          { name: 'Martur Fompak', metric: '휴머노이드 자율 사내 물류 · 100% ERP 연동' },
+          { name: 'BMW / TATA Motors', metric: '36개 ERP 클라우드 전환 / Clean Core 2.0' }
+        ],
+        scenarios: [
+          {
+            title: 'Autonomous Unified Commerce & Mobility Service (판매-구독-빌링)',
+            steps: ['상품·번들 기획 (CPQ)', '리테일 수요·재고 (IBP)', '개인화 커머스·견적', '오더·구독 이행 (BRIM)', '사용량 기반 빌링·회계']
+          },
+          {
+            title: 'Direct Materials Sourcing & Catena-X (자동차 직접 자재 조달)',
+            steps: ['설계·BOM 협업 (IPD)', '소싱 & 지수기반 가격 (Ariba)', 'MRP·구매 오더 (Cloud ERP)', '공급사 협업 (Catena-X)', '인보이스·탄소 정산']
+          }
+        ]
+      }
+    };
+
+    const SPACES = [
+      { id: 'sp1', title: 'Autonomous Adaptive Production', desc: 'CTO+ 주문형 생산 · 설비 OEE · 스크랩 절감 워크스페이스', agents: '생산계획, 엔지니어링, 조달 Agent' },
+      { id: 'sp2', title: 'Autonomous Asset Management', desc: '예지정비 · 안전 허가 · 부품 조달 Closed-loop 공간', agents: '자산성과, 유지보수, 현장서비스 Agent' },
+      { id: 'sp3', title: 'EU CBAM & Catena-X Carbon', desc: 'Scope 1/2/3 추적 · Green Ledger · PCF 공시 공간', agents: '탄소회계, 규제매핑, 공급망리스크 Agent' },
+      { id: 'sp4', title: 'Mobility Service & SDV Billing', desc: '커넥티드 구독 모델 · CPQ · 사용량 기반 BRIM 정산', agents: '구독생애주기, 가격책정, 청구 Agent' }
+    ];
+
+    const SUITE_DATA = [
+      // Finance (12 Assistants, 54 Agents)
+      { domain: 'Finance', name: '재무계획 Assistant', count: 5, agents: ['재무 예측 Agent', '차이 분석 Agent', '시장 심리 분석 Agent', '대화형 계획 Agent', '모델 생성 Agent'] },
+      { domain: 'Finance', name: '매출채권 Assistant', count: 6, agents: ['분쟁 생성 Agent', '분쟁 해결 Agent', '수금 계정 준비 Agent', '매출채권 계정 분석 Agent', '수금 이메일 발송 Agent', '독촉 인사이트 Agent'] },
+      { domain: 'Finance', name: '재무마감 Assistant', count: 6, agents: ['분개 Agent', '회계 발생 Agent', '분석 인사이트 Agent', '재무 일관성 분석 Agent', '자산 회계 이상 징후 탐지 Agent', '내부 거래 매칭 및 조정 Agent'] },
+      { domain: 'Finance', name: '세무 및 컴플라이언스 Assistant', count: 10, agents: ['법적 변경 Agent', '전자 청구서 설정 Agent', '규제 문서 매핑 설명 Agent', '법정 보고서 분석 Agent', '세금 구성 Agent', '세금 분류 Agent'] },
+      { domain: 'Finance', name: '거버넌스 & 자금 Assistant', count: 6, agents: ['제재 대상 검증 Agent', '감사 Agent', '국제 무역 분류 Agent', '현금 포지셔닝 Agent', '은행 관리 Agent', '자금 조달 Agent'] },
+      // SCM (6 Assistants, 61 Agents)
+      { domain: 'SCM', name: '제품설계 Assistant', count: 9, agents: ['레시피 수식 Agent', '제품 변경 관리 Agent', '제품 지식 추출 Agent', '제품 구조 최적화 Agent', '엔지니어링 Agent', '실현 가능성 검토 Agent'] },
+      { domain: 'SCM', name: '계획 Assistant', count: 5, agents: ['예외 관리 Agent', '재고 투자 배분 Agent', '프로젝트 관리 Agent', '자원 계획 Agent', 'NC & CAPA Agent'] },
+      { domain: 'SCM', name: '조달 Assistant', count: 8, agents: ['카테고리 전략 Agent', 'RFx 오케스트레이션 Agent', '송장 검증 Agent', '중복 탐지 Agent', '컴플라이언스 모니터링 Agent', '원자재 거래 Agent'] },
+      { domain: 'SCM', name: '생산 Assistant', count: 6, agents: ['생산 계획 및 운영 Agent', '생산 마스터 데이터 준비 Agent', '생산 계획 오더 진행 Agent', '규제 컴플라이언스 Agent', 'Batch 릴리즈 Agent', '생산 계획 Agent'] },
+      { domain: 'SCM', name: '물류 Assistant', count: 11, agents: ['물류 이슈 해결 Agent', '창고 작업 부하 최적화 Agent', '자재 예약 처리 Agent', '내부 재고 보충 Agent', '대량 운송 Agent', 'FSCA & 제품 리콜 Agent'] },
+      { domain: 'SCM', name: '자산 및 서비스 Assistant', count: 22, agents: ['기술자 브리핑 Agent', '유지보수 비용 계획 시뮬레이션 Agent', '자산 성과 건전성 분석 Agent', '장비 인사이트 Agent', '안전 허가 Agent', '현장 기술자 Agent'] },
+      // Spend (12 Assistants, 52 Agents)
+      { domain: 'Spend', name: '카테고리 관리 & 소싱 Assistant', count: 7, agents: ['지출 분석 Agent', '시장 인사이트 Agent', '카테고리 전략 수립 Agent', '비용 절감 기회 발굴 Agent', '소싱 이벤트 Agent', '입찰 분석 Agent', '소싱 협상 Agent'] },
+      { domain: 'Spend', name: '구매 계약 & 요청 Assistant', count: 9, agents: ['자재 지출 자문 Agent', '구매 계약 작성 Agent', '구매 계약 준수 모니터링 Agent', '구매 계약 갱신 최적화 Agent', '구매 요청 생성 Agent', '구매 요청 최적화 Agent'] },
+      { domain: 'Spend', name: '송장 & 공급업체 관리 Assistant', count: 16, agents: ['송장 캡처 및 정보 추출 Agent', '송장 부정 방지 Agent', '송장/계약 매칭 Agent', '공급업체 식별 및 최적화 Agent', '공급업체 리스크 모니터링 및 알람 Agent', '공급업체 실사 Agent'] },
+      // HCM (15 Assistants, 81 Agents)
+      { domain: 'HCM', name: 'Core HR & 급여 Assistant', count: 13, agents: ['임직원 정보 통합 Agent', '직무 최적화 Agent', '급여 설명 Agent', '급여 이상 탐지 Agent', '근태 승인 Agent', '교대근무 계획 Agent'] },
+      { domain: 'HCM', name: '스킬 & 역량향상 Assistant', count: 9, agents: ['스킬 거버넌스 Agent', '직무체계 유지관리 Agent', '스킬 증빙 Agent', '맞춤형 학습 여정 Agent', '마이크로 러닝 Agent', '학습 튜터 Agent'] },
+      { domain: 'HCM', name: '인적 인텔리전스 & 채용 Assistant', count: 14, agents: ['인력 ROI 모델링 Agent', '이직 예측 Agent', '역매칭 Agent', '인터뷰 일정관리 Agent', '승계 계획 Agent', '동적 인재풀 Agent'] },
+      // CX (12 Assistants, 44 Agents)
+      { domain: 'CX', name: '영업 & 딜 검증/마감 Assistant', count: 12, agents: ['딜 관리 Agent', '미팅 인사이트 Agent', '파이프라인 리스크 분석 Agent', '리드 검증 Agent', '영업 가격 Agent', '주문 자동화 Agent'] },
+      { domain: 'CX', name: '쇼핑 & 주문 관리 Assistant', count: 5, agents: ['사이트 개인화 Agent', '프로모션 개인화 Agent', '조건부 구매 Agent', '주문 신뢰성 Agent', '매출 조정 Agent'] },
+      { domain: 'CX', name: '서비스 관리 & 셀프서비스 Assistant', count: 8, agents: ['에스컬레이션 Agent', '감정/토픽 분석 Agent', '고객 여정 Agent', '케이스 준비 Agent', '케이스 조치 추천 Agent'] }
+    ];
+
+    const KG_DETAILS = {
+      supplier: '<strong>Supplier (공급사·관세 리스크)</strong> → 연결 객체: Material/BOM, Prod. Order, Margin.<br><em>Root Cause:</em> 특정 지역 관세 15% 인상 시 대체 니어쇼어링 공급사 3곳을 즉시 탐색하고 구매 오더(PO) 단가 변동을 재무 마진에 자동 반영합니다.',
+      carbon: '<strong>Carbon PCF (Scope 3 · EU CBAM)</strong> → 연결 객체: Material/BOM, Prod. Order, Margin.<br><em>Impact Analysis:</em> 원자재(철강·알루미늄·배터리) 탄소 배출량이 임계치 초과 시 CBAM 예상 부과금을 산출하고 Green Ledger 서브원장에 기록합니다.',
+      bom: '<strong>Material / BOM (원자재·설계)</strong> → 연결 객체: Supplier, Carbon PCF, Prod. Order.<br><em>Impact Analysis:</em> 설계 변경(IPD) 또는 레이저 절단 스크랩 10% 절감 시 소요량(MRP)과 표준원가가 실시간 재계산됩니다.',
+      plant: '<strong>Plant & Asset (설비·OEE)</strong> → 연결 객체: Prod. Order, Margin.<br><em>Root Cause:</em> 설비 진동 이상 감지 시 APM 예지정비 Agent가 비계획 다운타임 전에 교대 일정을 재조정하여 납기(OTIF)를 보호합니다.',
+      order: '<strong>Prod. Order (CTO+ 맞춤형 생산 오더)</strong> → 연결 객체: Margin.<br><em>Impact Analysis:</em> 설계·생산·물류가 피드백 루프로 연결되어 납기 변동 시 영업(CPQ)과 고객에게 실시간 일정을 통지합니다.',
+      margin: '<strong>Margin (실시간 손익 · PaPM)</strong> → 최종 재무 영향 노드.<br><em>Insight:</em> 공장·라인·제품군 단위까지 활동기준원가(ABC)와 탄소 원가를 즉시 드릴다운하여 영업이익률을 추적합니다.'
+    };
+
+    // --- App State ---
+    let state = {
+      industry: 'im',
+      role: 'COO',
+      domainFilter: 'ALL',
+      searchQuery: '',
+      selectedAssistant: SUITE_DATA[0],
+      hubAgents: [
+        { name: 'Production Planning Agent', domain: 'SCM', status: 'Operate', owner: 'COO' },
+        { name: 'EU CBAM Carbon Ledger Agent', domain: 'Finance/ESG', status: 'Operate', owner: 'CFO' },
+        { name: 'AI Visit Report Assistant', domain: 'CX', status: 'Optimize', owner: 'CRO' },
+        { name: 'Embodied Intralogistics Agent', domain: 'Industry AI', status: 'Verify', owner: 'COO' }
+      ],
+      auditLogs: [
+        { time: '10:42:10', role: 'COO', action: 'Joule Work 세션 초기화 및 Principal Propagation 검증', status: 'ALLOWED' },
+        { time: '10:45:03', role: 'CFO', action: 'Green Ledger Scope 3 PCF 데이터 조회 (Catena-X)', status: 'ALLOWED' }
+      ],
+      profitChart: null
+    };
+
+    function addAuditLog(action, status = 'ALLOWED') {
+      const now = new Date();
+      const time = now.toTimeString().slice(0, 8);
+      state.auditLogs.unshift({ time, role: state.role, action, status });
+      renderAuditLogs();
+    }
+
+    // --- Render Functions ---
+    function renderKPIStrip() {
+      const data = INDUSTRY_DATA[state.industry];
+      const container = document.getElementById('industry-kpi-strip');
+      container.innerHTML = data.kpis.map(k => `
+        <div class="glass-card rounded-2xl p-4 shadow-sm">
+          <div class="text-xs font-medium text-slate-500">${k.title}</div>
+          <div class="text-xl sm:text-2xl font-extrabold ${k.color} mt-1">${k.value}</div>
+          <div class="text-[11px] text-slate-500 mt-1 leading-snug">${k.sub}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderJoulePanel() {
+      const data = INDUSTRY_DATA[state.industry];
+      document.getElementById('welcome-industry-label').textContent = data.label;
+      document.getElementById('welcome-role-label').textContent = state.role;
+      document.getElementById('joule-role-badge').textContent = `Principal Auth: ${state.role}`;
+
+      const promptsEl = document.getElementById('joule-quick-prompts');
+      promptsEl.innerHTML = data.prompts.map((p, idx) => `
+        <button type="button" data-prompt-idx="${idx}" class="quick-prompt-btn text-left text-xs px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition">
+          ✦ ${p}
+        </button>
+      `).join('');
+
+      promptsEl.querySelectorAll('.quick-prompt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const text = data.prompts[Number(btn.dataset.promptIdx)];
+          executeJoulePrompt(text);
+        });
+      });
+
+      document.getElementById('joule-spaces-list').innerHTML = SPACES.map(sp => `
+        <button type="button" data-space="${sp.title}" class="space-card w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40 transition">
+          <div class="text-xs font-bold text-slate-900">${sp.title}</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">${sp.desc}</div>
+          <div class="text-[10px] font-semibold text-indigo-600 mt-1">연결 Agent: ${sp.agents}</div>
+        </button>
+      `).join('');
+
+      document.querySelectorAll('.space-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+          executeJoulePrompt(`${btn.dataset.space} 작업 공간 활성화 및 주요 이상 징후 브리핑해줘`);
+        });
+      });
+
+      document.getElementById('joule-benchmarks').innerHTML = data.benchmarks.map(b => `
+        <div class="flex items-start justify-between gap-2 bg-white/80 rounded-lg px-2.5 py-2 border border-indigo-100">
+          <span class="font-bold text-indigo-950 shrink-0">${b.name}</span>
+          <span class="text-slate-600 text-right">${b.metric}</span>
+        </div>
+      `).join('');
+    }
+
+    function executeJoulePrompt(promptText) {
+      if (!promptText.trim()) return;
+      const log = document.getElementById('joule-chat-log');
+
+      // User message
+      const userDiv = document.createElement('div');
+      userDiv.className = 'flex justify-end';
+      userDiv.innerHTML = `<div class="bg-indigo-600 text-white rounded-xl px-4 py-2.5 text-xs sm:text-sm max-w-xl shadow-sm">${promptText.replace(/</g, '&lt;')}</div>`;
+      log.appendChild(userDiv);
+
+      // Determine contextual orchestration response
+      let assistantName = 'SCM · 계획 및 생산 Assistant';
+      let agentsUsed = ['생산 계획 Agent', '재고 최적화 Agent', '수익성 분석 Agent'];
+      let insight = 'Knowledge Graph 분석 결과, 현재 공장 가동률과 재고 수준을 기준으로 최적 실행안을 도출했습니다.';
+
+      if (promptText.includes('탄소') || promptText.includes('PCF') || promptText.includes('CBAM') || promptText.includes('Carbon')) {
+        assistantName = 'Sustainability · Green Ledger Assistant';
+        agentsUsed = ['제품 탄소발자국(PCF) Agent', '규제 문서 매핑 Agent', 'Catena-X 데이터 교환 Agent'];
+        insight = 'S/4HANA 자재 원장 및 물류 데이터를 기반으로 Scope 1·2·3 및 PCF 산출을 완료했습니다. (엑셀 수동 방식 대비 3~5배 효율화, 외부 컨설팅 비용 절감)';
+      } else if (promptText.includes('관세') || promptText.includes('소싱') || promptText.includes('재고')) {
+        assistantName = 'Autonomous Spend & SCM Assistant';
+        agentsUsed = ['다중 소싱 시나리오 Agent', 'MEIO 안전재고 Agent', '지출 분석 Agent'];
+        insight = '관세 시나리오 반영 결과, 니어쇼어링 비중을 15% 상향하고 안전재고를 재산출할 경우 예상 EBIT 마진 하락폭을 2.4%p 방어할 수 있습니다.';
+      } else if (promptText.includes('로봇') || promptText.includes('피킹') || promptText.includes('Embodied')) {
+        assistantName = 'Embodied AI Orchestrator';
+        agentsUsed = ['EWM 자재 우선순위 Agent', 'Physical AI 경로 Agent', 'Robot OS 커넥터'];
+        insight = '창고 내 HMND-01 휴머노이드 로봇에 피킹 미션을 하달했으며, 작업 완료 즉시 EWM 재고 이동 전표가 자동 전기되도록 설정했습니다.';
+      } else if (promptText.includes('보고서') || promptText.includes('Visit')) {
+        assistantName = 'Autonomous CX · 영업 Assistant';
+        agentsUsed = ['음성 인식(Whisper) Agent', '미팅 인사이트 Agent', 'Sales Cloud 동기화 Agent'];
+        insight = '고객 방문 음성 메모에서 핵심 요구사항·후속 일정·견적 요청을 추출해 5분 내 표준 방문 보고서 생성을 완료했습니다.';
+      }
+
+      const botDiv = document.createElement('div');
+      botDiv.className = 'flex gap-3';
+      botDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-lg gradient-joule text-white flex items-center justify-center font-bold text-xs shrink-0">J</div>
+        <div class="bg-white border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm text-slate-700 shadow-sm max-w-2xl space-y-2">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold text-[11px]">${assistantName}</span>
+            <span class="text-[11px] text-slate-400">• 권한 검증(${state.role}) 통과</span>
+          </div>
+          <p class="leading-relaxed">${insight}</p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            ${agentsUsed.map(a => `<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] border border-slate-200">⚙ ${a}</span>`).join('')}
+          </div>
+        </div>
+      `;
+      log.appendChild(botDiv);
+      log.scrollTop = log.scrollHeight;
+      addAuditLog(`Joule 실행: "${promptText.slice(0, 32)}..." (${assistantName})`);
+    }
+
+    // --- Tab 2: Autonomous Suite ---
+    function renderSuite() {
+      const domains = [
+        { id: 'ALL', label: '전체 도메인 (57 Assistants / 292 Agents)' },
+        { id: 'Finance', label: 'Finance (12 / 54)' },
+        { id: 'SCM', label: 'SCM (6 / 61)' },
+        { id: 'Spend', label: 'Spend (12 / 52)' },
+        { id: 'HCM', label: 'HCM (15 / 81)' },
+        { id: 'CX', label: 'CX (12 / 44)' }
+      ];
+
+      document.getElementById('suite-domain-filters').innerHTML = domains.map(d => `
+        <button type="button" data-domain="${d.id}" class="domain-btn px-3 py-1.5 rounded-full text-xs font-semibold border transition ${state.domainFilter === d.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'}">
+          ${d.label}
+        </button>
+      `).join('');
+
+      document.querySelectorAll('.domain-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.domainFilter = btn.dataset.domain;
+          renderSuite();
+        });
+      });
+
+      const q = state.searchQuery.trim().toLowerCase();
+      const filtered = SUITE_DATA.filter(item => {
+        const matchDomain = state.domainFilter === 'ALL' || item.domain === state.domainFilter;
+        const matchQuery = !q || item.name.toLowerCase().includes(q) || item.agents.some(a => a.toLowerCase().includes(q));
+        return matchDomain && matchQuery;
+      });
+
+      const grid = document.getElementById('suite-assistants-grid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-2 text-center py-8 text-xs text-slate-500">검색 조건에 일치하는 Assistant가 없습니다.</div>`;
+      } else {
+        grid.innerHTML = filtered.map(item => {
+          const isSelected = state.selectedAssistant && state.selectedAssistant.name === item.name;
+          return `
+            <button type="button" data-asst="${item.name}" class="asst-card text-left p-4 rounded-xl border transition ${isSelected ? 'border-indigo-500 bg-indigo-50/70 ring-1 ring-indigo-500' : 'border-slate-200 bg-white hover:border-indigo-300'}">
+              <div class="flex items-center justify-between gap-2 mb-1.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${item.domain}</span>
+                <span class="text-[11px] font-semibold text-indigo-700">${item.count} Agents</span>
+              </div>
+              <div class="text-sm font-bold text-slate-900">${item.name}</div>
+              <div class="text-[11px] text-slate-500 mt-1 truncate">${item.agents.slice(0, 3).join(' · ')}</div>
+            </button>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('.asst-card').forEach(card => {
+          card.addEventListener('click', () => {
+            state.selectedAssistant = SUITE_DATA.find(x => x.name === card.dataset.asst);
+            renderSuite();
+          });
+        });
+      }
+
+      // Detail Panel
+      if (state.selectedAssistant) {
+        const a = state.selectedAssistant;
+        document.getElementById('detail-title').textContent = `${a.name} (${a.domain})`;
+        document.getElementById('detail-desc').textContent = `하위 ${a.count}개 전문 AI Agent를 조율하여 비즈니스 프로세스를 자율 실행합니다.`;
+        document.getElementById('detail-agents-list').innerHTML = a.agents.map(ag => `
+          <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-[11px] font-medium text-slate-700">✦ ${ag}</span>
+        `).join('');
+        document.getElementById('btn-run-assistant').disabled = false;
+      }
+    }
+
+    // --- Tab 3: Industry & Embodied AI ---
+    function renderIndustryScenarios() {
+      const data = INDUSTRY_DATA[state.industry];
+      document.getElementById('industry-scenario-badge').textContent = data.label;
+      document.getElementById('industry-scenarios-container').innerHTML = data.scenarios.map(sc => `
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70">
+          <div class="text-sm font-bold text-slate-900 mb-3">${sc.title}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+            ${sc.steps.map((st, i) => `
+              <div class="bg-white border border-indigo-100 rounded-lg p-2.5 text-center shadow-sm">
+                <div class="text-[10px] font-bold text-indigo-600 mb-0.5">STEP ${i + 1}</div>
+                <div class="text-xs font-semibold text-slate-800">${st}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- Tab 4: BAIP ---
+    function renderAgentHub() {
+      document.getElementById('hub-count').textContent = `총 ${state.hubAgents.length}개 활성`;
+      const statuses = ['Explore', 'Register', 'Verify', 'Operate', 'Optimize', 'Retire'];
+      document.getElementById('agent-hub-list').innerHTML = state.hubAgents.map((ag, idx) => `
+        <div class="px-4 py-2.5 flex items-center justify-between gap-2 text-xs">
+          <div>
+            <div class="font-bold text-slate-900">${ag.name}</div>
+            <div class="text-[11px] text-slate-500">${ag.domain} · Owner: ${ag.owner}</div>
+          </div>
+          <select data-hub-idx="${idx}" class="hub-status-select rounded-md border border-slate-300 px-2 py-1 text-[11px] font-semibold bg-slate-50">
+            ${statuses.map(s => `<option value="${s}" ${ag.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.hub-status-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          const idx = Number(e.target.dataset.hubIdx);
+          state.hubAgents[idx].status = e.target.value;
+          addAuditLog(`Agent Hub 상태 변경: ${state.hubAgents[idx].name} → ${e.target.value}`);
+        });
+      });
+    }
+
+    function renderAuditLogs() {
+      document.getElementById('audit-trail-list').innerHTML = state.auditLogs.slice(0, 12).map(l => `
+        <div class="px-4 py-2 flex items-start justify-between gap-2">
+          <div>
+            <span class="font-mono text-[11px] text-slate-400 mr-1.5">${l.time}</span>
+            <span class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold text-[10px] mr-1">${l.role}</span>
+            <span class="text-slate-700">${l.action}</span>
+          </div>
+          <span class="text-[10px] font-bold text-emerald-700 shrink-0">${l.status}</span>
+        </div>
+      `).join('');
+    }
+
+    // --- Tab 5: Profitability Simulator ---
+    function updateProfitSimulator() {
+      const tariff = Number(document.getElementById('sim-tariff').value);
+      const carbon = Number(document.getElementById('sim-carbon').value);
+      const local = Number(document.getElementById('sim-local').value);
+      const scrap = Number(document.getElementById('sim-scrap').value);
+
+      document.getElementById('val-tariff').textContent = `${tariff}%`;
+      document.getElementById('val-carbon').textContent = `€${carbon}`;
+      document.getElementById('val-local').textContent = `${local}%`;
+      document.getElementById('val-scrap').textContent = `${scrap}%`;
+
+      // Realistic financial simulation (Base Revenue = 1,000억 원, Base Margin = 14.0%)
+      const tariffBurden = Math.round((tariff * 2.2) * (1 - local / 100)); // 억원
+      const carbonBurden = Math.round((carbon * 0.18) * (1 - scrap / 30)); // 억원
+      const totalBurden = tariffBurden + carbonBurden;
+      const aiSaving = Math.round((scrap * 4.5) + (local * 0.25)); // 억원
+      const ebitMargin = Math.max(1.5, (14.0 - (totalBurden / 10) + (aiSaving / 10))).toFixed(1);
+
+      document.getElementById('kpi-cost-burden').textContent = `-${totalBurden}억 원`;
+      document.getElementById('kpi-ai-saving').textContent = `+${aiSaving}억 원`;
+      document.getElementById('kpi-ebit-margin').textContent = `${ebitMargin}%`;
+
+      const baselineProfit = Math.max(10, 140 - Math.round(tariff * 2.2 + carbon * 0.18));
+      const optimizedProfit = Math.max(15, 140 - totalBurden + aiSaving);
+
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if (state.profitChart) {
+        state.profitChart.data.datasets[0].data = [140, baselineProfit, optimizedProfit];
+        state.profitChart.update();
+      } else {
+        state.profitChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['기존 기준 이익 (억원)', '관세·탄소 충격 후 (미대응)', 'Autonomous AI 최적화 후'],
+            datasets: [{
+              label: '예상 영업이익 (억 원)',
+              data: [140, baselineProfit, optimizedProfit],
+              backgroundColor: ['#94a3b8', '#f43f5e', '#4f46e5'],
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+    }
+
+    // --- Event Listeners ---
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('tab-active'));
+        btn.classList.add('tab-active');
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`tab-${target}`).classList.remove('hidden');
+        if (target === 'insights') updateProfitSimulator();
+      });
+    });
+
+    document.getElementById('btn-ind-im').addEventListener('click', () => {
+      state.industry = 'im';
+      document.getElementById('btn-ind-im').className = 'px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition';
+      document.getElementById('btn-ind-auto').className = 'px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition';
+      renderKPIStrip();
+      renderJoulePanel();
+      renderIndustryScenarios();
+      addAuditLog('산업 컨텍스트 전환: 산업제조 (Industrial Manufacturing)');
+    });
+
+    document.getElementById('btn-ind-auto').addEventListener('click', () => {
+      state.industry = 'auto';
+      document.getElementById('btn-ind-auto').className = 'px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition';
+      document.getElementById('btn-ind-im').className = 'px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition';
+      renderKPIStrip();
+      renderJoulePanel();
+      renderIndustryScenarios();
+      addAuditLog('산업 컨텍스트 전환: 자동차 · 모빌리티 (Automotive)');
+    });
+
+    document.getElementById('role-select').addEventListener('change', (e) => {
+      state.role = e.target.value;
+      renderJoulePanel();
+      addAuditLog(`역할 기반 권한 전환 (Principal Propagation): ${state.role}`);
+    });
+
+    document.getElementById('joule-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const inp = document.getElementById('joule-input');
+      if (inp.value.trim()) {
+        executeJoulePrompt(inp.value);
+        inp.value = '';
+      }
+    });
+
+    document.getElementById('suite-search').addEventListener('input', (e) => {
+      state.searchQuery = e.target.value;
+      renderSuite();
+    });
+
+    document.getElementById('btn-run-assistant').addEventListener('click', () => {
+      if (!state.selectedAssistant) return;
+      const out = document.getElementById('suite-run-output');
+      out.classList.remove('hidden');
+      out.innerHTML = `
+        <div class="font-bold text-emerald-700">✓ ${state.selectedAssistant.name} 실행 완료</div>
+        <div>조율된 에이전트: ${state.selectedAssistant.agents.slice(0, 3).join(', ')}</div>
+        <div class="text-slate-500">비즈니스 객체 검증 및 거버넌스 감사 로그 기록 완료.</div>
+      `;
+      addAuditLog(`Autonomous Suite 실행: ${state.selectedAssistant.name} (${state.selectedAssistant.domain})`);
+    });
+
+    document.getElementById('btn-dispatch-robot').addEventListener('click', () => {
+      const uc = document.getElementById('embodied-usecase').value;
+      const app = document.getElementById('embodied-app').value;
+      const robot = document.getElementById('embodied-robot').value;
+      const log = document.getElementById('embodied-log');
+
+      [1, 2, 3, 4].forEach(n => {
+        const el = document.getElementById(`step-emb-${n}`);
+        el.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50');
+      });
+
+      const ts = new Date().toTimeString().slice(0, 8);
+      log.innerHTML += `
+        <div class="text-sky-300">[${ts}] [JOULE] 미션 생성: ${uc} → 타겟: ${robot}</div>
+        <div class="text-violet-300">[${ts}] [EMBODIED AGENT] Physical AI 경로 및 안전 제약조건 생성 완료</div>
+        <div class="text-amber-300">[${ts}] [ROBOT OS] ${robot} 현장 물리 작업 수행 완료 (오류 0건)</div>
+        <div class="text-emerald-400">[${ts}] [CLOSED-LOOP] ${app} 트랜잭션 자동 전기 및 완료 보고!</div>
+      `;
+      log.scrollTop = log.scrollHeight;
+      addAuditLog(`Embodied AI 미션 완료: ${uc} (${robot} → ${app})`);
+    });
+
+    document.getElementById('studio-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('studio-name').value.trim();
+      const base = document.getElementById('studio-base').value;
+      const model = document.getElementById('studio-model').value;
+      if (!name) return;
+
+      state.hubAgents.unshift({ name, domain: `Custom (${base.split(' ')[0]})`, status: 'Verify', owner: state.role });
+      renderAgentHub();
+      const toast = document.getElementById('studio-toast');
+      toast.classList.remove('hidden');
+      toast.textContent = `✓ "${name}" (${model} 기반)이 빌드되어 AI Agent Hub에 배포되었습니다.`;
+      document.getElementById('studio-name').value = '';
+      addAuditLog(`Joule Studio 신규 Agent 빌드 및 배포: ${name}`);
+    });
+
+    document.querySelectorAll('.kg-node').forEach(node => {
+      node.addEventListener('click', () => {
+        const key = node.dataset.node;
+        document.getElementById('kg-analysis-box').innerHTML = KG_DETAILS[key] || '';
+        addAuditLog(`Knowledge Graph 관계 추론 조회: ${key.toUpperCase()}`);
+      });
+    });
+
+    ['sim-tariff', 'sim-carbon', 'sim-local', 'sim-scrap'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateProfitSimulator);
+    });
+
+    document.getElementById('btn-mitigate-risk').addEventListener('click', () => {
+      document.getElementById('cassandra-msg').textContent = '✓ 커스텀 코드 Assistant가 RAP 현대화 및 Clean Core 대체 API 18건 변환 패치를 생성하여 테스트 관리 Assistant로 이관했습니다.';
+      addAuditLog('Agent-led 전환 리스크 완화 조치 실행 (Cassandra → Clean Core)');
+    });
+
+    // --- Initial Render ---
+    renderKPIStrip();
+    renderJoulePanel();
+    renderSuite();
+    renderIndustryScenarios();
+    renderAgentHub();
+    renderAuditLogs();
+  </script>
+</body>
+</html>
