@@ -47,9 +47,10 @@
 
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <!-- Industry Context Switcher -->
-        <div class="inline-flex rounded-lg bg-white/10 p-0.5 border border-white/20" role="group" aria-label="산업군 선택">
-          <button id="btn-ind-im" type="button" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition">산업제조 (IM)</button>
-          <button id="btn-ind-auto" type="button" class="px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition">자동차 (Auto)</button>
+        <div class="inline-flex rounded-lg bg-white/10 p-0.5 border border-white/20" role="group" aria-label="산업군 및 기업 선택">
+          <button id="btn-ind-im" type="button" class="px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition">산업제조 (IM)</button>
+          <button id="btn-ind-auto" type="button" class="px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition">자동차 (Auto)</button>
+          <button id="btn-ind-mfi" type="button" class="px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition">Martur Fompak (MFI)</button>
         </div>
 
         <!-- Principal Propagation Role Selector -->
@@ -637,6 +638,37 @@
             steps: ['설계·BOM 협업 (IPD)', '소싱 & 지수기반 가격 (Ariba)', 'MRP·구매 오더 (Cloud ERP)', '공급사 협업 (Catena-X)', '인보이스·탄소 정산']
           }
         ]
+      },
+      mfi: {
+        label: 'Martur Fompak International (MFI) — 글로벌 Tier-1 시트·인테리어',
+        kpis: [
+          { title: '글로벌 생산·R&D 네트워크', value: '30개 공장 / 7개국', sub: '튀르키예·루마니아·이탈리아·슬로바키아·모로코·알제리 (R&D 4곳)', color: 'text-indigo-700' },
+          { title: '일일 라인 피딩 & AI 제어', value: '400건/일 · 100%', sub: 'S/4HANA & EWM 기반 100% SAP 소프트웨어 주도 의사결정', color: 'text-emerald-700' },
+          { title: '임직원 AI 만족도 / 효율', value: '>80% / >90%', sub: '800+명 프로젝트 참여 · 향후 양산 처리량 최대 5x 목표', color: 'text-violet-700' },
+          { title: '탄소 발자국 & 품질 인증', value: 'SFM + IATF 16949', sub: '시트·폼·인테리어 공급망 PCF 실시간 산출 및 OEM 공유', color: 'text-sky-700' }
+        ],
+        prompts: [
+          'MFI 창고 HMND 01 Alpha 휴머노이드 시트 폼 피킹 및 EWM 실적 자동 전기',
+          'Renault·Stellantis·Ford 납품 시트 시스템 SFM 공급망 탄소발자국(PCF) 산출',
+          'MFI 30개 공장 몰드 폼·자동차 텍스타일·LED/액추에이터 다중 소싱 최적화',
+          '800+명 현장 작업자 고위험 반복 물류 로봇 이관 및 안전·스킬 재배치'
+        ],
+        benchmarks: [
+          { name: '자율 사내 물류', metric: '일 400건 라인 피딩 · 100% SAP 소프트웨어 의사결정' },
+          { name: 'Embodied AI', metric: '영국 Humanoid(HMND 01) + AMR 협업 · 2026 SAP Innovation Awards 수상' },
+          { name: '임직원 체감 성과', metric: '800+명 참여 · 파일럿 만족도 >80% · 효율성 최우선 가치 >90%' },
+          { name: 'ESG SFM', metric: '시트·폼·텍스타일 원자재별 탄소 발자국 실시간 계산 및 OEM 공유' }
+        ],
+        scenarios: [
+          {
+            title: 'MFI × Humanoid 자율 사내 물류 Closed-Loop (S/4HANA + EWM + Embodied AI)',
+            steps: ['생산 오더·자재 소요 감지 (S/4HANA)', '우선순위·시퀀싱 판단 (Joule)', '자재 피킹·경로 생성 (EWM + Embodied AI)', '현장 이송·라인 피딩 (HMND 01 + AMR)', '실적 자동 확인·전기 (100% SAP)']
+          },
+          {
+            title: 'MFI 글로벌 시트·인테리어 E2E 제조 및 탄소 관리 (30 Plants · 7 Countries)',
+            steps: ['OEM 맞춤형 시트·트림 설계 (R&D 4곳)', '폼·텍스타일·LED 조달 (Ariba)', 'IATF 16949 혼류 생산 (30개 공장)', '공급망 PCF 실시간 산출 (SFM)', '글로벌 OEM 적시 납품 (OTIF)']
+          }
+        ]
       }
     };
 
@@ -992,6 +1024,75 @@
           { title: 'CX 프로세스 스코어 및 신규 FAQ', desc: '사업부별 고객 경험 지표 업데이트' }
         ],
         sampleResult: '고위험 불만 티켓 4건 조기 에스컬레이션 및 해결 가이드 제시 완료. 반복 문의 12건 기반 셀프서비스 지식 문서 2건 자동 발행.'
+      },
+      // Martur Fompak (MFI) E2E Assistants
+      {
+        domain: 'MFI', name: 'MFI 자율 사내 물류 (Embodied AI) Assistant', count: 5,
+        impact: '일 400건 피딩 · 양산 처리량 최대 5x 목표',
+        desc: 'S/4HANA와 EWM 데이터를 실시간으로 해석해 HMND 01 휴머노이드 및 AMR의 자재 우선순위 지정·피킹·라인 피딩을 자율 지휘합니다.',
+        agents: ['S/4HANA 생산신호 Agent', 'EWM 자재 우선순위 Agent', 'Embodied AI 경로 Agent', 'HMND 01 Robot OS Agent', 'SAP 실적 자동전기 Agent'],
+        workflow: [
+          { agent: 'S/4HANA 생산신호 Agent', action: '시트 조립 라인의 실시간 소비율 및 긴급 시퀀스 변동 감지', io: '입력: S/4HANA PP/DM → 전달: 라인 자재 소요' },
+          { agent: 'EWM 자재 우선순위 Agent', action: '보관 위치(Bin)·생산 우선순위·예외 상황을 반영한 작업 큐 생성', io: '입력: SAP EWM → 전달: 우선순위 피킹 오더' },
+          { agent: 'Embodied AI / HMND 01 Agent', action: '휴머노이드(HMND 01 Alpha) 및 AMR 플릿에 파지·이송 경로 지시', io: '입력: Physical AI 모델 → 전달: 물리 작업 실행' },
+          { agent: 'SAP 실적 자동전기 Agent', action: '라인 피딩 완료 즉시 EWM 재고 이동 및 생산 투입 실적 100% 자동 기록', io: '최종 산출물 생성' }
+        ],
+        deliverables: [
+          { title: '실시간 휴머노이드·AMR 작업 큐', desc: '일 400건 라인 피딩 무인 스케줄' },
+          { title: '100% SAP EWM 자동 전기 이력', desc: '수작업 터치포인트 제거 및 오류 0건 기록' }
+        ],
+        sampleResult: '시트 프레임 및 몰드 폼 18개 팔레트 우선순위 재조정 완료. HMND 01 Alpha가 Bay-A에서 조립 라인 #3으로 12분 내 무오류 이송 및 EWM 자동 전기 완료.'
+      },
+      {
+        domain: 'MFI', name: 'MFI 시트·인테리어 글로벌 생산 Assistant', count: 6,
+        impact: '7개국 30개 공장 통합 최적화',
+        desc: '시트 시스템, 몰드 폼(Fompak), 자동차 텍스타일, LED·액추에이터 등 다품종 부품의 글로벌 R&D-조달-생산을 조율합니다.',
+        agents: ['R&D 사양 추출 Agent', '폼/텍스타일 MRP Agent', '다공장 캐파 배분 Agent', 'IATF 16949 품질 Agent', 'OEM 납기(aATP) Agent', '설비 예지정비 Agent'],
+        workflow: [
+          { agent: 'R&D 사양 추출 Agent', action: '4개 R&D센터·6개 엔지니어링 오피스의 OEM별 시트/트림 설계 스펙 통합', io: '입력: PLM/CAD → 전달: 글로벌 표준 BOM' },
+          { agent: '폼/텍스타일 MRP Agent', action: '튀르키예·루마니아·이탈리아·모로코 등 30개 공장의 원자재 소요량 산출', io: '입력: S/4HANA MRP → 전달: 공장별 조달 계획' },
+          { agent: '다공장 캐파 배분 Agent', action: 'Renault·Stellantis·Ford·VW 주문 변동에 따른 공장 간 생산 부하 조정', io: '입력: IBP 수주 → 전달: 최적 생산 배정표' },
+          { agent: 'IATF 16949 품질 Agent', action: '자동차 품질 표준 기반 성형·봉제·조립 공정 검사 및 출하 승인', io: '최종 산출물 생성' }
+        ],
+        deliverables: [
+          { title: '30개 공장 통합 생산·조달 배분표', desc: '유럽·북아프리카 거점별 부하 균형안' },
+          { title: 'IATF 16949 공정 품질 인증 패키지', desc: 'OEM 납품용 로트별 추적 성적서' }
+        ],
+        sampleResult: 'Stellantis 신규 EV 시트 주문(+18%)에 맞춰 부르사·루마니아 공장 생산 슬롯 재배정 완료. 폼 원자재 리드타임 3일 단축 및 IATF 품질 기준 100% 충족.'
+      },
+      {
+        domain: 'MFI', name: 'MFI 공급망 탄소발자국 (SFM) Assistant', count: 4,
+        impact: '제품·원자재별 PCF 실시간 산출',
+        desc: 'SAP Sustainability Footprint Management(SFM)를 기반으로 시트·폼·텍스타일 원자재부터 완제품까지의 탄소 발자국을 계산합니다.',
+        agents: ['원자재 활동데이터 수집 Agent', 'SFM 탄소 회계 Agent', '친환경 소재 대체 시뮬레이터', 'OEM PCF 공유 Agent'],
+        workflow: [
+          { agent: '원자재 활동데이터 수집 Agent', action: '스틸 프레임·폴리우레탄 폼·원단·운송 에너지 데이터 자동 추출', io: '입력: S/4HANA + 설비계측 → 전달: 활동량 데이터' },
+          { agent: 'SFM 탄소 회계 Agent', action: '부품·공정별 배출계수 매핑 및 Scope 1·2·3 제품 탄소 발자국(PCF) 산출', io: '입력: SAP SFM → 전달: 부품별 PCF 수치' },
+          { agent: '친환경 소재 대체 시뮬레이터', action: '재활용 소재·저탄소 폼 적용 시 탄소 감축량 및 원가 변동 비교', io: '입력: BOM 대안 → 전달: 감축 시나리오' },
+          { agent: 'OEM PCF 공유 Agent', action: '완성차 고객사(OEM) 및 내부 의사결정팀용 친환경 리포트 자동 배포', io: '최종 산출물 생성' }
+        ],
+        deliverables: [
+          { title: '시트·인테리어 제품별 PCF 명세서', desc: '원자재·공정별 탄소 기여도 분해 리포트' },
+          { title: '저탄소 소재 전환 ROI 시뮬레이션', desc: '친환경 대안별 배출 감축 및 마진 영향' }
+        ],
+        sampleResult: '차기 EV 시트 어셈블리 1대당 PCF 42.6 kgCO₂e 산출 완료. 재활용 텍스타일 35% 적용 시 PCF 18.4% 추가 감축 가능 시나리오 도출 및 OEM 포털 공유.'
+      },
+      {
+        domain: 'MFI', name: 'MFI 현장 인력·안전·스킬 Assistant', count: 4,
+        impact: '800+명 참여 · 작업장 안전·생산성↑',
+        desc: '반복·고부하 물류 작업을 로봇으로 이관하고 현장 인력을 고부가가치 품질·조율 업무로 전환하도록 지원합니다.',
+        agents: ['작업 부하·안전 분석 Agent', '인간-로봇 협업 배분 Agent', '스킬 전환 코칭 Agent', '현장 피드백 분석 Agent'],
+        workflow: [
+          { agent: '작업 부하·안전 분석 Agent', action: '반복 중량물 운반 등 근골격계 부담 및 안전 위험 공정 식별', io: '입력: EHS/현장 로그 → 전달: 로봇 이관 후보 공정' },
+          { agent: '인간-로봇 협업 배분 Agent', action: '휴머노이드/AMR 전담 구역과 인간 작업자 협업 구역 최적 분리', io: '입력: 라인 레이아웃 → 전달: 안전 협업 매트릭스' },
+          { agent: '스킬 전환 코칭 Agent', action: '800+명 현장 인력 대상 로봇 관제·품질 분석 맞춤형 교육 배정', io: '입력: 직원 스킬 프로필 → 전달: 업스킬링 계획' },
+          { agent: '현장 피드백 분석 Agent', action: '파일럿 만족도(>80%) 및 효율 체감(>90%) 설문 기반 개선안 도출', io: '최종 산출물 생성' }
+        ],
+        deliverables: [
+          { title: '인간-로봇 안전 협업 배치도', desc: '고위험 수작업 제로화 및 동선 분리안' },
+          { title: '현장 인력 고부가가치 직무 전환표', desc: '로봇 오퍼레이터·품질 전문가 육성 현황' }
+        ],
+        sampleResult: '고부하 자재 운반 12개 구간 로봇 이관으로 근골격계 위험 지수 64% 감소. 기존 물류 인력 45명 대상 AI 물류 관제 및 품질 검사 교육 과정 배정 완료.'
       }
     ];
 
@@ -1142,7 +1243,8 @@
     // --- Tab 2: Autonomous Suite ---
     function renderSuite() {
       const domains = [
-        { id: 'ALL', label: '전체 도메인 (57 Assistants / 292 Agents)' },
+        { id: 'ALL', label: '전체 도메인 (57+ Assistants / 311+ Agents)' },
+        { id: 'MFI', label: 'Martur Fompak (MFI) E2E' },
         { id: 'Finance', label: 'Finance (12 / 54)' },
         { id: 'SCM', label: 'SCM (6 / 61)' },
         { id: 'Spend', label: 'Spend (12 / 52)' },
@@ -1370,25 +1472,34 @@
       });
     });
 
-    document.getElementById('btn-ind-im').addEventListener('click', () => {
-      state.industry = 'im';
-      document.getElementById('btn-ind-im').className = 'px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition';
-      document.getElementById('btn-ind-auto').className = 'px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition';
-      renderKPIStrip();
-      renderJoulePanel();
-      renderIndustryScenarios();
-      addAuditLog('산업 컨텍스트 전환: 산업제조 (Industrial Manufacturing)');
-    });
+    function switchIndustryContext(indKey, labelText) {
+      state.industry = indKey;
+      const activeCls = 'px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition';
+      const inactiveCls = 'px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition';
+      document.getElementById('btn-ind-im').className = indKey === 'im' ? activeCls : inactiveCls;
+      document.getElementById('btn-ind-auto').className = indKey === 'auto' ? activeCls : inactiveCls;
+      document.getElementById('btn-ind-mfi').className = indKey === 'mfi' ? activeCls : inactiveCls;
 
-    document.getElementById('btn-ind-auto').addEventListener('click', () => {
-      state.industry = 'auto';
-      document.getElementById('btn-ind-auto').className = 'px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition';
-      document.getElementById('btn-ind-im').className = 'px-3 py-1.5 text-xs font-medium rounded-md text-indigo-100 hover:text-white transition';
+      clearSimTimers();
+      if (indKey === 'mfi') {
+        state.domainFilter = 'MFI';
+        const mfiFirst = SUITE_DATA.find(x => x.domain === 'MFI');
+        if (mfiFirst) state.selectedAssistant = mfiFirst;
+      } else if (state.domainFilter === 'MFI') {
+        state.domainFilter = 'ALL';
+        state.selectedAssistant = SUITE_DATA[0];
+      }
+
       renderKPIStrip();
       renderJoulePanel();
+      renderSuite();
       renderIndustryScenarios();
-      addAuditLog('산업 컨텍스트 전환: 자동차 · 모빌리티 (Automotive)');
-    });
+      addAuditLog(`컨텍스트 전환: ${labelText}`);
+    }
+
+    document.getElementById('btn-ind-im').addEventListener('click', () => switchIndustryContext('im', '산업제조 (Industrial Manufacturing)'));
+    document.getElementById('btn-ind-auto').addEventListener('click', () => switchIndustryContext('auto', '자동차 · 모빌리티 (Automotive)'));
+    document.getElementById('btn-ind-mfi').addEventListener('click', () => switchIndustryContext('mfi', 'Martur Fompak International (MFI)'));
 
     document.getElementById('role-select').addEventListener('change', (e) => {
       state.role = e.target.value;
